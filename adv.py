@@ -42,7 +42,79 @@ player = Player(world.starting_room)
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
 traversal_path = []
+print('traversal_path', traversal_path)
 
+# Find exits
+def get_all_exits_directions(current_room, visited_rooms):
+    # declare empty list of valid exits
+    valid_exits = []# [] | ['n', | 's', | 'w', | 'e']
+    #find our options on where we can go by using utility .get_exits method from room.py file
+    for exit in current_room.get_exits(): #['n', 's', 'w', 'e'] | ['n', 's']
+        # if the current room has not been visited
+        if room_graph[current_room.id][1][exit] not in visited_rooms: #exit: 'n' | 's' not in visited_rooms {0}, exit: 'n'
+            # mark as visited and add the exit
+            valid_exits.append(exit) # ['n', | 's', | 'w', | 'e']
+    #return the updated valid exits
+    return valid_exits
+
+# Find rooms to walk to
+def find_rooms():
+
+    # create empty set to keep track of  visited rooms
+    visited_rooms = set() # {0}
+    # adds the player's current room to the set of visited rooms
+    visited_rooms.add(player.current_room.id) # visited_rooms = {0}
+    print('player.current_room.id', player.current_room.id)
+    # empty list to reverse the path out of the room
+    backtrack = []
+    # print('backtrack', backtrack)
+
+    # while loop the visited rooms is less than the length of unvisited rooms graph's key(id)
+    while len(visited_rooms) < len(room_graph.keys()):# 0 < 9 = true
+        print('visited_rooms', visited_rooms) #{0} | {0,1}
+        # print('room_graph', room_graph.keys())
+        #sets the player in the current room to the
+        current_room = player.current_room.id # current_room = 0
+        print('current_room', current_room)
+        # Search for all exit points in room using func get_all_exits_directions()
+        valid_exit_path = get_all_exits_directions(player.current_room, visited_rooms) #  valid_exit_path => ['n']
+        print('valid_exit_path' , valid_exit_path)
+
+        # if there are no valid exits go reverse
+        if len(valid_exit_path) == 0: # ['n', 's', 'w', 'e'] len(4) == 0 => false
+            # removes the last path used
+            exit_direction = backtrack.pop()
+            # print('exit_direction', exit_direction)
+            player.travel(exit_direction)
+            # adds the exit_direction/path
+            traversal_path.append(exit_direction)
+            # continue with while loop
+            continue 
+
+        # if the room hasn't been visited 
+        for exit_direction in valid_exit_path:# exit_direction=>'n' in ['n', 's', 'w', 'e']
+            print('exit_direction',exit_direction)
+            # add the current room to visited
+            visited_rooms.add(room_graph[current_room][1][exit_direction]) # exit_direction=> 'n'
+            print('visited_rooms',visited_rooms)# {0,1}
+            # adds the exit_direction/path 
+            traversal_path.append(exit_direction)
+            print('traversal_path',traversal_path)
+            print('--------')
+
+            # the reverse path back out 
+            if exit_direction == "n":
+                backtrack.append("s")
+            elif exit_direction == "s":
+                backtrack.append("n")
+            elif exit_direction == "w":
+                backtrack.append("e")
+            else:
+                backtrack.append("w")
+            player.travel(exit_direction)
+            break
+
+find_rooms()
 
 
 # TRAVERSAL TEST - DO NOT MODIFY
